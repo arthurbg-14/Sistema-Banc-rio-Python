@@ -1,36 +1,60 @@
-hud = "[d] Depositar [s] Sacar [e] Extrato [x] Sair"
+import os
+import time
+from colorama import Fore, Style
 
-d = ""
-s = ""
-e = ""
-x = ""
 
-saldo = 0
-limite = 500
-extrato = ""
-quantidade_saques = 0
-LIMITE_SAQUES = 3
-
-while(True):
-
-    operacao = input(hud)
-
-    if operacao == "d":
-        valor = float(input("Valor do depósito: "))
+class Banco:
+    def __init__(self):
+        self.saldo = 0
+        self.limite = 500
+        self.operaçoes = ""
+        self.quantidade_saques = 0
+        self.limite_saques = 3
+        self.hud = "[d] Depositar [s] Sacar [e] Extrato [x] Sair\n"
+    def menu(self):
+        os.system('cls')
+        operacao = input(self.hud)
+        if operacao == "d":
+            self.depositar()
+        elif operacao == "s":
+            self.sacar()
+        elif operacao == "e":
+            self.extrato()
+        elif operacao == "x":
+            exit()
+        os.system('cls')
+        print("operação não reconhecida!")
+        time.sleep(1)
+        self.menu()
+    def depositar(self):
+        try:
+            valor = float(input("Valor do depósito: "))
+        except:
+            print("Valor inválido!")
+            time.sleep(1)
+            self.menu()
 
         if valor > 0:
-            saldo += valor
-            extrato += f"Sucesso, valor depositado: R$ {valor:.2f}\n"
-            
+                self.saldo += valor
+                self.operaçoes += f"{Fore.GREEN}Sucesso, valor depositado: R$ {valor:.2f}\n{Style.RESET_ALL}"
+                print(f"Novo saldo: R$ {self.saldo}")
         else:
+            os.system('cls')
             print("Deposito inválido!")
-    
-    elif operacao == "s":
-        valor = float(input("Valor do saque: "))
 
-        saldo_excedido = valor > saldo
-        limite_execedido = valor > limite
-        saques_execedidos = quantidade_saques >LIMITE_SAQUES
+        time.sleep(1)
+        self.menu()
+    def sacar(self):
+        try:
+            valor = float(input("Valor do saque: "))
+        except:
+            print("Valor inválido!")
+            time.sleep(1)
+            self.menu()
+
+        saldo_excedido = valor > self.saldo
+        limite_execedido = valor > self.limite
+        saques_execedidos = self.quantidade_saques > self.limite_saques
 
         if saldo_excedido:
             print("Falha! Não possui saldo suficiente")
@@ -39,20 +63,23 @@ while(True):
         elif saques_execedidos:
             print("Você não possui mais saques a disponibilidade.")
         elif valor > 0:
-            saldo += valor 
-            quantidade_saques += 1
-            extrato += f"Sucesso, valor sacado: R$ {valor:.2f}\n"
+            self.saldo -= valor 
+            self.quantidade_saques += 1
+            self.operaçoes += f"{Fore.RED}Sucesso, valor sacado: R$ {valor:.2f}\n{Style.RESET_ALL}"
+            print(f"Novo saldo: R$ {self.saldo}")
             
         else:
             print("Saque inválido!")
 
-    elif operacao == "e":
+        time.sleep(1)
+        self.menu()
+    def extrato(self):
         print("\n==========EXTRATO==========")
-        print("Nenhuma movimentação registrada." if not extrato else extrato)
-        print(f"\nSaldo: R$ {saldo:.2f}")
+        print("Nenhuma movimentação registrada." if not self.operaçoes else self.operaçoes)
+        print(f"\nSaldo: R$ {self.saldo:.2f}")
         print("\n===========================")
+        pause = input()
+        self.menu()
 
-    elif operacao == "x":
-        break
-    else:
-        print("Falha!")
+banco = Banco()
+banco.menu()
